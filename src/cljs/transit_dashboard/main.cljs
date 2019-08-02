@@ -1,12 +1,9 @@
-(ns transit-dashboard.core
-  (:require
-   [reagent.core :as reagent]
-   [re-frame.core :as re-frame]
-   [transit-dashboard.events :as events]
-   [transit-dashboard.views :as views]
-   [transit-dashboard.config :as config]
-   ))
-
+(ns transit-dashboard.main
+  (:require [reagent.core :as reagent]
+            [re-frame.core :as re-frame]
+            [transit-dashboard.events :as events]
+            [transit-dashboard.views :as views]
+            [transit-dashboard.config :as config]))
 
 (defn dev-setup []
   (when config/debug?

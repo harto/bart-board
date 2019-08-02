@@ -4,46 +4,13 @@
                  [reagent "0.8.1"]
                  [re-frame "0.10.8"]]
 
-  :plugins [[lein-cljsbuild "1.1.7"]]
-
   :min-lein-version "2.5.3"
-
   :source-paths ["src/clj" "src/cljs"]
-
-  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
+  ;; :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
 
   :figwheel {:css-dirs ["resources/public/css"]}
 
-  :profiles
-  {:dev
-   {:dependencies [[binaryage/devtools "0.9.10"]]
+  :profiles {:dev {:dependencies [[com.bhauman/figwheel-main "0.2.3"]]}}
 
-    :plugins      [[lein-figwheel "0.5.18"]]}
-   :prod { }
-   }
-
-  :cljsbuild
-  {:builds
-   [{:id           "dev"
-     :source-paths ["src/cljs"]
-     :figwheel     {:on-jsload "transit-dashboard.core/mount-root"}
-     :compiler     {:main                 transit-dashboard.core
-                    :output-to            "resources/public/js/compiled/app.js"
-                    :output-dir           "resources/public/js/compiled/out"
-                    :asset-path           "js/compiled/out"
-                    :source-map-timestamp true
-                    :preloads             [devtools.preload]
-                    :external-config      {:devtools/config {:features-to-install :all}}
-                    }}
-
-    {:id           "min"
-     :source-paths ["src/cljs"]
-     :compiler     {:main            transit-dashboard.core
-                    :output-to       "resources/public/js/compiled/app.js"
-                    :optimizations   :advanced
-                    :closure-defines {goog.DEBUG false}
-                    :pretty-print    false}}
-
-
-    ]}
-  )
+  :aliases {"fig:dev"      ["trampoline" "run" "-m" "figwheel.main" "-b" "dev" "-r"]
+            "fig:dev:once" ["trampoline" "run" "-m" "figwheel.main" "-bo" "dev"]})
