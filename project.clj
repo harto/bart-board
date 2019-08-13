@@ -1,6 +1,7 @@
 (defproject transit-dashboard "0.1.0-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [org.clojure/clojurescript "1.10.520"]
+                 [org.clojure/data.xml "0.2.0-alpha6"]
                  [reagent "0.8.1"]
                  [re-frame "0.10.8"]
                  [cljs-http "0.1.46"]]
