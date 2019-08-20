@@ -1,6 +1,10 @@
 (ns transit-dashboard.subs
-  (:require [re-frame.core :as re-frame]))
+  (:require [re-frame.core :as rf]))
 
-(re-frame/reg-sub ::name
+(rf/reg-sub :stations
   (fn [db]
-    (:name db)))
+    (vals (:stations db))))
+
+(rf/reg-sub :selected-station
+  (fn [db]
+    (get (:stations db) (:selected-station-id db))))
