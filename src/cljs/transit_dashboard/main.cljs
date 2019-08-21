@@ -1,9 +1,11 @@
-(ns transit-dashboard.main
+(ns ^:figwheel-hooks transit-dashboard.main
   (:require [reagent.core :as reagent]
             [re-frame.core :as re-frame]
-            [transit-dashboard.events :as events]
             [transit-dashboard.views :as views]
-            [transit-dashboard.config :as config]))
+            [transit-dashboard.config :as config]
+            ;; register events and subs
+            [transit-dashboard.events]
+            [transit-dashboard.subs]))
 
 (defn dev-setup []
   (when config/debug?
@@ -16,6 +18,9 @@
                   (.getElementById js/document "app")))
 
 (defn ^:export init []
-  (re-frame/dispatch-sync [::events/initialize-db])
+  (re-frame/dispatch-sync [:initialize])
   (dev-setup)
+  (mount-root))
+
+(defn ^:after-load rerender []
   (mount-root))

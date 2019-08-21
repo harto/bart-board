@@ -4,7 +4,9 @@
                  [org.clojure/data.xml "0.2.0-alpha6"]
                  [reagent "0.8.1"]
                  [re-frame "0.10.8"]
-                 [cljs-http "0.1.46"]]
+                 [day8.re-frame/http-fx "0.1.6"]
+                 ;[cljs-http "0.1.46"]
+                 ]
 
   :min-lein-version "2.5.3"
   :source-paths ["src/clj" "src/cljs"]

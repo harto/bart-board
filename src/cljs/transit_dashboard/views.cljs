@@ -1,12 +1,11 @@
 (ns transit-dashboard.views
-  (:require [re-frame.core :as rf]
-            [transit-dashboard.events :as events]
-            [transit-dashboard.subs :as subs]))
+  (:require [re-frame.core :as rf]))
 
 (defn station-selector []
   (let [stations @(rf/subscribe [:stations])]
     [:select
-     {:on-change #(rf/dispatch [::events/select-station (.-value (.-target %))])}
+     {:value (:id @(rf/subscribe [:selected-station]))
+      :on-change #(rf/dispatch [:select-station (.-value (.-target %))])}
      (for [station stations]
        [:option {:key (:id station)
                  :value (:id station)}
@@ -19,5 +18,4 @@
      [:h2 (if station
             (:name station)
             "<no station selected>")]
-     [station-selector]
-     ]))
+     [station-selector]]))
