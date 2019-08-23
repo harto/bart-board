@@ -2,13 +2,14 @@
   (:require [re-frame.core :as rf]))
 
 (defn station-selector []
-  (let [stations @(rf/subscribe [:stations])]
+  (let [stations @(rf/subscribe [:stations])
+        selected-station @(rf/subscribe [:selected-station])]
     [:select
-     {:value (:id @(rf/subscribe [:selected-station]))
+     {:value (if selected-station (:id selected-station) "")
       :on-change #(rf/dispatch [:select-station (.-value (.-target %))])}
-     (for [station stations]
-       [:option {:key (:id station)
-                 :value (:id station)}
+     (for [station (sort-by :name stations)]
+       [:option {:key (:abbr station)
+                 :value (:abbr station)}
         (:name station)])]))
 
 (defn main-panel []

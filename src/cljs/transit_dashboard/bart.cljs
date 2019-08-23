@@ -1,64 +1,68 @@
 (ns transit-dashboard.bart
-  ;; (:require-macros [cljs.core.async.macros :refer [go]])
-  ;; (:require [cljs-http.client :as http]
-  ;;           [cljs.core.async :refer [<!]]
-  ;;           [clojure.data.xml :as xml]
-  ;;           [clojure.string :as str])
-  (:require [ajax.core :as ajax])
-  )
+  (:require [ajax.core :as ajax]
+            [ajax.protocols]
+            [clojure.data.xml :as xml]
+            [clojure.string :as str]))
 
-(def base-url "https://api.bart.gov/api/")
-;; TODO: figure out how this will work in production
-;;(def api-key "SOMETIHGN")
+;; TODO: figure out how this should work in production
 (def api-key "QXM2-5HI6-9N5T-DWE9")
+
+(def operations
+  {:stations {:uri "https://api.bart.gov/api/stn.aspx" :cmd "stns"}
+   :departures {:uri "https://api.bart.gov/api/etd.aspx" :cmd "etd"}})
+
+
+;; If the API receives invalid input, instead of generating an error response,
+;; it returns HTTP 200 and an XML-encoded error (even though we ask for
+;; JSON). We handle this with an ajax response interceptor.
+
+(defn mime-type [resp]
+  (-> (ajax.protocols/-get-all-headers resp)
+      (get "content-type")
+      (str/split ";")
+      (first)))
+
+(defn extract-error-message [s]
+  (let [doc (xml/parse-str s :raw true)]
+    (when-let [err-el (.querySelector doc "error > details")]
+      (->> err-el
+           (xml/element-data)
+           (:content)
+           (apply str)))))
+
+(defn error-message [resp]
+  (when (and (= (ajax.protocols/-status resp) 200)
+             (= (mime-type resp) "text/xml"))
+    (extract-error-message (ajax.protocols/-body resp))))
+
+(defn xml-error-response-interceptor []
+  (ajax/to-interceptor {:name "XML error response parser"
+                        :response (fn [response]
+                                    (if-let [err (error-message response)]
+                                      ;; TODO: figure out if these values are correct
+                                      (reduced [false {:status 400
+                                                       :status-text err
+                                                       :failure :error
+                                                       :response response}])
+                                      response))}))
+
+;; (defn unnest-json-response-interceptor []
+;;   (ajax/to-interceptor {:name "JSON response unnester"
+;;                         :response (fn [x]
+;;                                     (println "oh look: " x)
+;;                                     x)}))
 
 (defn request
   "Prepare a request map, suitable for use with either :http-xhrio effects or
   directly with cljs-ajax."
-  [endpoint & keyvals]
-  (merge {:method :get
-          :url "https://api.bart.gov/api/something"
-          :timeout 10000
-          :response-format (ajax/json-response-format)
-          }
-         (apply hash-map keyvals)))
-
-;; (defn extract-xml-error [s]
-;;   (try
-;;     (let [doc (xml/parse-str s :raw true)]
-;;       (when-let [err-el (.querySelector doc "error > details")]
-;;         (let [message (->> err-el
-;;                            (xml/element-data)
-;;                            (:content)
-;;                            (apply str))]
-;;           (ex-info message {:message message}))))
-;;     (catch ExceptionInfo e
-;;       e)))
-
-;; (defn extract-error [resp]
-;;   ;; API returns errors as XML even though we asked for JSON.
-;;   (let [mime-type (-> resp
-;;                       (get-in [:headers "content-type"])
-;;                       (str/split ";")
-;;                       (first))]
-;;     (when (= mime-type "text/xml")
-;;       (extract-xml-error (:body resp)))))
-
-;; (defn fetch
-;;   ([endpoint-path cmd]
-;;    (fetch endpoint-path cmd nil))
-;;   ([endpoint-path cmd opts]
-;;    (go
-;;      (let [resp (<! (http/get (str base-url endpoint-path)
-;;                               {:with-credentials? false
-;;                                :query-params (merge {:key api-key
-;;                                                      :cmd cmd
-;;                                                      :json "y"}
-;;                                                     opts)}))]
-;;        (or (extract-error resp) (get-in resp [:body :root]))))))
-
-;; (defn stations []
-;;   (go (get-in (<! (fetch "stn.aspx" "stns")) [:stations :station])))
-
-;; (defn departures [station-id]
-;;   (fetch "etd.aspx" "etd" {:orig station-id}))
+  [op & opts]
+  {:pre [(contains? operations op)]}
+  (let [{:keys [uri cmd]} (get operations op)]
+    (merge {:method :get
+            :uri uri
+            :params {:key api-key
+                     :json "y"
+                     :cmd cmd}
+            :response-format (ajax/json-response-format {:keywords? true})
+            :interceptors [(xml-error-response-interceptor)]}
+           (apply hash-map opts))))

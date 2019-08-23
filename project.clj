@@ -14,7 +14,8 @@
 
   :figwheel {:css-dirs ["resources/public/css"]}
 
-  :profiles {:dev {:dependencies [[com.bhauman/figwheel-main "0.2.3"]]}}
+  :profiles {:dev {:dependencies [[com.bhauman/figwheel-main "0.2.3"]
+                                  [org.clojure/core.async "0.4.500"]]}}
 
   :aliases {"fig:dev"      ["trampoline" "run" "-m" "figwheel.main" "-b" "dev" "-r"]
             "fig:dev:once" ["trampoline" "run" "-m" "figwheel.main" "-bo" "dev"]})
