@@ -6,6 +6,7 @@
         selected-station @(rf/subscribe [:selected-station])]
     [:select
      {:value (if selected-station (:id selected-station) "")
+      :disabled (when-not stations "disabled")
       :on-change #(rf/dispatch [:select-station (.-value (.-target %))])}
      (for [station (sort-by :name stations)]
        [:option {:key (:abbr station)
