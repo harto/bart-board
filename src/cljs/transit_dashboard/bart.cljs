@@ -7,11 +7,6 @@
 ;; The shared API key provided at https://www.bart.gov/schedules/developers/api.
 (def api-key "MW9S-E7SL-26DU-VV8V")
 
-(def operations
-  {:stations {:uri "https://api.bart.gov/api/stn.aspx" :cmd "stns"}
-   :departures {:uri "https://api.bart.gov/api/etd.aspx" :cmd "etd"}})
-
-
 ;; If the API receives invalid input, instead of generating an error response,
 ;; it returns HTTP 200 and an XML-encoded error (even though we ask for
 ;; JSON). We handle this with an ajax response interceptor.
@@ -55,14 +50,23 @@
 (defn request
   "Prepare a request map, suitable for use with either :http-xhrio effects or
   directly with cljs-ajax."
-  [op & opts]
-  {:pre [(contains? operations op)]}
-  (let [{:keys [uri cmd]} (get operations op)]
-    (merge {:method :get
-            :uri uri
-            :params {:key api-key
-                     :json "y"
-                     :cmd cmd}
-            :response-format (ajax/json-response-format {:keywords? true})
-            :interceptors [(xml-error-response-interceptor)]}
-           (apply hash-map opts))))
+  [{:keys [uri on-success on-failure params]}]
+  {:method :get
+   :uri uri
+   :params (merge params {:key api-key :json "y"})
+   :response-format (ajax/json-response-format {:keywords? true})
+   :interceptors [(xml-error-response-interceptor)]
+   :on-success on-success
+   :on-failure on-failure})
+
+;;
+
+(defn stations [& {:as opts}]
+  (request (merge opts
+                  {:uri "https://api.bart.gov/api/stn.aspx"
+                   :params {:cmd "stns"}})))
+
+(defn departures [& {:as opts}]
+  (request (merge opts
+                  {:uri "https://api.bart.gov/api/etd.aspx"
+                   :params {:cmd "etd" :orig "all"}})))

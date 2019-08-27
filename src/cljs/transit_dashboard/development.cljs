@@ -11,4 +11,4 @@
     c))
 
 (comment
-  (go (println (<! (fetch (bart/request :departures))))))
+  (go (println (<! (fetch (bart/departures :station-id "all"))))))

@@ -2,14 +2,21 @@
   (:require [re-frame.core :as rf]
             [day8.re-frame.http-fx]  ;; auto-register :http-xhrio effect handler
             [transit-dashboard.bart :as bart]
-            [transit-dashboard.db :as db]))
+            [transit-dashboard.db :as db]
+            [transit-dashboard.utils :refer [key-by]]))
 
 (rf/reg-event-fx :initialize
   (fn [_ _]
     {:db db/default-db
-     :http-xhrio (bart/request :stations
-                               :on-success [:fetch-stations-success]
-                               :on-failure [:fetch-stations-failure])}))
+     :dispatch-n [[:fetch-stations]
+                  [:repeatedly-fetch-departures]]}))
+
+;; Stations
+
+(rf/reg-event-fx :fetch-stations
+                 (fn [_ _]
+                   {:http-xhrio (bart/stations :on-success [:fetch-stations-success]
+                                               :on-failure [:fetch-stations-failure])}))
 
 (rf/reg-event-db :fetch-stations-success
   (fn [db [_ resp]]
@@ -17,14 +24,37 @@
     (let [stations (get-in resp [:root :stations :station])]
       ;; TODO: normalize response resources?
       ;; TODO: is there a built-in (e.g. index-by)?
-      (assoc db :stations (into {} (for [s stations] [(:abbr s) s]))))))
+      (assoc db :stations (key-by stations :abbr)))))
 
+;; FIXME: do something useful
 (rf/reg-event-db :fetch-stations-failure
   (fn [db [_ result]]
-    (.log js/console (clj->js result)) ; FIXME remove
+    (.log js/console (clj->js result))  ; FIXME remove
     (dissoc db :stations)))
 
-;; TODO: update to fetch latest departure data
 (rf/reg-event-db :select-station
   (fn [db [_ station-id]]
     (assoc db :selected-station-id station-id)))
+
+;; Departures
+
+(rf/reg-event-fx :repeatedly-fetch-departures
+  (fn [_ _]
+    {:dispatch [:fetch-departures]
+     :dispatch-later [{:ms (* 60 1000) :dispatch [:repeatedly-fetch-departures]}]}))
+
+(rf/reg-event-fx :fetch-departures
+  (fn [_ _]
+    {:http-xhrio (bart/departures :on-success [:fetch-departures-success]
+                                  :on-failure [:fetch-departures-failure])}))
+
+(rf/reg-event-db :fetch-departures-success
+  (fn [db [_ resp]]
+    (let [departures (get-in resp [:root :station])]
+      (assoc db :departures (key-by departures :abbr)))))
+
+;; FIXME: do something useful
+(rf/reg-event-db :fetch-departures-failure
+  (fn [db [_ result]]
+    (.log js/console (clj->js result))  ; FIXME remove
+    (dissoc db :stations)))
