@@ -24,3 +24,6 @@
 
 (defn ^:after-load rerender []
   (mount-root))
+
+(when config/debug?
+  (require 'transit-dashboard.development))

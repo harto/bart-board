@@ -1,4 +1,4 @@
-(ns ^:figwheel-hooks transit-dashboard.development
+(ns transit-dashboard.development
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.core.async :refer [<! chan put!]]
             [ajax.core :as ajax]
