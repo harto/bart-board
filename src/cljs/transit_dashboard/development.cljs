@@ -1,7 +1,8 @@
-(ns development.helpers
+(ns ^:figwheel-hooks transit-dashboard.development
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.core.async :refer [<! chan put!]]
-            [ajax.core :as ajax]))
+            [ajax.core :as ajax]
+            [transit-dashboard.bart :as bart]))
 
 (defn fetch [req]
   (let [c (chan)]
@@ -10,5 +11,4 @@
     c))
 
 (comment
-  (require '[transit-dashboard.bart :as bart])
-  (go (println (<! (fetch (bart/request :stations))))))
+  (go (println (<! (fetch (bart/request :departures))))))
