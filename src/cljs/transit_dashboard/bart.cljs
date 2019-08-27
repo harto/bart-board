@@ -4,8 +4,8 @@
             [clojure.data.xml :as xml]
             [clojure.string :as str]))
 
-;; TODO: figure out how this should work in production
-(def api-key "QXM2-5HI6-9N5T-DWE9")
+;; The shared API key provided at https://www.bart.gov/schedules/developers/api.
+(def api-key "MW9S-E7SL-26DU-VV8V")
 
 (def operations
   {:stations {:uri "https://api.bart.gov/api/stn.aspx" :cmd "stns"}
