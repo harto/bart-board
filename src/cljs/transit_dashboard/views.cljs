@@ -13,7 +13,7 @@
                  :value (:abbr station)}
         (:name station)])]))
 
-(defn main-panel []
+(defn root []
   (let [station @(rf/subscribe [:selected-station])]
     [:div
      [:h1 "Bart board"]
