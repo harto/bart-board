@@ -41,11 +41,7 @@
                                                        :response response}])
                                       response))}))
 
-;; (defn unnest-json-response-interceptor []
-;;   (ajax/to-interceptor {:name "JSON response unnester"
-;;                         :response (fn [x]
-;;                                     (println "oh look: " x)
-;;                                     x)}))
+;; Request factory functions
 
 (defn request
   "Prepare a request map, suitable for use with either :http-xhrio effects or
@@ -59,8 +55,6 @@
    :on-success on-success
    :on-failure on-failure})
 
-;;
-
 (defn stations [& {:as opts}]
   (request (merge opts
                   {:uri "https://api.bart.gov/api/stn.aspx"
@@ -70,3 +64,21 @@
   (request (merge opts
                   {:uri "https://api.bart.gov/api/etd.aspx"
                    :params {:cmd "etd" :orig "all"}})))
+
+;; Helpers
+
+(def date-pattern #"^(\d{2})/(\d{2})/(\d{4})$")
+(def time-pattern #"^(\d{2}):(\d{2}):(\d{2}) (AM|PM) ([A-Z]+)$")
+
+(defn parse-time [date time]
+  (let [[_ month day year] (re-find date-pattern date)
+        [_ hour minute second am-pm tz] (re-find time-pattern time)]
+    (doto (js/Date.)
+      (.setYear (js/parseInt year 10))
+      (.setMonth (dec (js/parseInt month 10)))
+      (.setDate (js/parseInt day 10))
+      (.setHours (+ (js/parseInt hour 10) (if (= am-pm "PM") 12 0)))
+      (.setMinutes (js/parseInt minute 10))
+      (.setSeconds (js/parseInt second 10))
+      ;; nowhere to put timezone :(
+      )))

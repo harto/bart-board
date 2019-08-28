@@ -13,6 +13,13 @@
                  :value (:abbr station)}
         (:name station)])]))
 
+(defn departures []
+  (let [departures @(rf/subscribe [:selected-station-departures])]
+    [:div (str departures)]))
+
+(defn last-updated-at []
+  [:div (str "Last updated at " @(rf/subscribe [:last-updated-at]))])
+
 (defn root []
   (let [station @(rf/subscribe [:selected-station])]
     [:div
@@ -20,4 +27,6 @@
      [:h2 (if station
             (:name station)
             "<no station selected>")]
-     [station-selector]]))
+     [station-selector]
+     [departures]
+     [last-updated-at]]))

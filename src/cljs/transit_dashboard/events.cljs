@@ -50,11 +50,15 @@
 
 (rf/reg-event-db :fetch-departures-success
   (fn [db [_ resp]]
-    (let [departures (get-in resp [:root :station])]
-      (assoc db :departures (key-by departures :abbr)))))
+    (let [payload (:root resp)
+          departures (:station payload)
+          resp-time (bart/parse-time (:date payload) (:time payload))]
+      (-> db
+          (assoc :departures (key-by departures :abbr))
+          (assoc :last-updated-at resp-time)))))
 
 ;; FIXME: do something useful
 (rf/reg-event-db :fetch-departures-failure
   (fn [db [_ result]]
     (.log js/console (clj->js result))  ; FIXME remove
-    (dissoc db :stations)))
+    (dissoc db :departures)))
