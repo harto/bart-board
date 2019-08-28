@@ -5,7 +5,7 @@
   (let [stations @(rf/subscribe [:stations])
         selected-station @(rf/subscribe [:selected-station])]
     [:select
-     {:value (if selected-station (:id selected-station) "")
+     {:value (if selected-station (:abbr selected-station) "")
       :disabled (when-not stations "disabled")
       :on-change #(rf/dispatch [:select-station (.-value (.-target %))])}
      (for [station (sort-by :name stations)]
