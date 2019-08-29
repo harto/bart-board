@@ -10,7 +10,8 @@
 
   :min-lein-version "2.5.3"
   :source-paths ["src/clj" "src/cljs"]
-  ;; :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
+  :resource-paths ["resources" "target/public"]
+  :clean-targets ^{:protect false} ["target"]
 
   :figwheel {:css-dirs ["resources/public/css"]}
 

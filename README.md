@@ -9,12 +9,12 @@ From within Emacs, run `M-x cider-jack-in-cljs` (or `C-c M-J`).
  - REPL type: `figwheel-main`
  - Build: `dev`
 
-From the command-line, run `lein fig:dev`
+Alternatively, from the command-line, run `lein fig:dev`
 
 ## Ideas/improvements
 
  - select multiple stations
  - find stations within _x_ minutes of user location (https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API)
- - include Muni times
+ - include other transit agencies:
    - https://511.org/developers/list/apis/
    - https://gist.github.com/grantland/7cf4097dd9cdf0dfed14 (?)
