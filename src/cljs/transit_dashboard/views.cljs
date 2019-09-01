@@ -15,7 +15,7 @@
                  :value (:abbr station)}
         (:name station)])]))
 
-(defn destination-departures [dest]
+(defn departures [dest]
   (let [color (:hexcolor (first (:estimate dest)))]
     [:div
      [:span {:style {:background-color color}}
@@ -29,7 +29,7 @@
   (let [destinations @(rf/subscribe [:selected-station-departures])]
     [:div
      (for [dest (sort-by :name destinations)]
-       ^{:key (:abbreviation dest)} [destination-departures dest])]))
+       ^{:key (:abbreviation dest)} [departures dest])]))
 
 (defn last-updated-at []
   [:div (str "Last updated at " @(rf/subscribe [:last-updated-at]))])
