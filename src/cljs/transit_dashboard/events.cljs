@@ -14,9 +14,9 @@
 ;; Stations
 
 (rf/reg-event-fx :fetch-stations
-                 (fn [_ _]
-                   {:http-xhrio (bart/stations :on-success [:fetch-stations-success]
-                                               :on-failure [:fetch-stations-failure])}))
+  (fn [_ _]
+    {:http-xhrio (bart/stations :on-success [:fetch-stations-success]
+                                :on-failure [:fetch-stations-failure])}))
 
 (rf/reg-event-db :fetch-stations-success
   (fn [db [_ resp]]
