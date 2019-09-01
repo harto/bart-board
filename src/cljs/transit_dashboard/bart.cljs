@@ -46,14 +46,12 @@
 (defn request
   "Prepare a request map, suitable for use with either :http-xhrio effects or
   directly with cljs-ajax."
-  [{:keys [uri on-success on-failure params]}]
-  {:method :get
-   :uri uri
-   :params (merge params {:key api-key :json "y"})
-   :response-format (ajax/json-response-format {:keywords? true})
-   :interceptors [(xml-error-response-interceptor)]
-   :on-success on-success
-   :on-failure on-failure})
+  [opts]
+  (merge (dissoc opts :params)
+         {:method :get
+          :params (merge (:params opts) {:key api-key :json "y"})
+          :response-format (ajax/json-response-format {:keywords? true})
+          :interceptors [(xml-error-response-interceptor)]}))
 
 (defn stations [& {:as opts}]
   (request (merge opts
