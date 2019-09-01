@@ -3,13 +3,21 @@
             [day8.re-frame.http-fx]  ;; auto-register :http-xhrio effect handler
             [transit-dashboard.bart :as bart]
             [transit-dashboard.db :as db]
+            [transit-dashboard.local-storage :as local-storage]
             [transit-dashboard.utils :refer [key-by]]))
 
 (rf/reg-event-fx :initialize
   (fn [_ _]
     {:db db/default-db
-     :dispatch-n [[:fetch-stations]
+     :dispatch-n [[:load-prefs]
+                  [:fetch-stations]
                   [:repeatedly-fetch-departures]]}))
+
+(rf/reg-event-fx :load-prefs
+  [(rf/inject-cofx ::local-storage/get "transit-dashboard.selected-station")]
+  (fn [cofx _]
+    (when-let [station-id (::local-storage/val cofx)]
+      {:dispatch [:select-station station-id]})))
 
 ;; Stations
 
@@ -32,9 +40,10 @@
     (.log js/console (clj->js result))  ; FIXME remove
     (dissoc db :stations)))
 
-(rf/reg-event-db :select-station
-  (fn [db [_ station-id]]
-    (assoc db :selected-station-id station-id)))
+(rf/reg-event-fx :select-station
+  (fn [{:keys [db]} [_ station-id]]
+    {:db (assoc db :selected-station-id station-id)
+     ::local-storage/merge {"transit-dashboard.selected-station" station-id}}))
 
 ;; Departures
 
