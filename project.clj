@@ -13,8 +13,6 @@
   :resource-paths ["resources" "target/public"]
   :clean-targets ^{:protect false} ["target"]
 
-  :figwheel {:css-dirs ["resources/public/css"]}
-
   :profiles {:dev {:dependencies [[com.bhauman/figwheel-main "0.2.3"]
                                   [org.clojure/core.async "0.4.500"]]}}
 

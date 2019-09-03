@@ -17,18 +17,15 @@ dist/main.js dist/main.js.map: project.clj prod.cljs.edn $(shell find src -type 
 dist/main.css: resources/public/css/main.css | dist
 	cp $< $@
 
-resources/public/css/main.css: resources/less/main.less | node_modules resources/public/css
+resources/public/css/%.css: resources/public/css/%.less | node_modules
 	node_modules/.bin/lessc $< $@
 
 node_modules: package.json yarn.lock
 	yarn install --pure-lockfile
 
-resources/public/css:
-	mkdir -p $@
-
 clean:
 	lein clean
-	rm -rf $(CSS_DIR)
+	rm -rf resources/public/css/*.css
 	rm -rf dist
 
 distclean: clean
