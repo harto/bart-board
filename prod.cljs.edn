@@ -1,6 +1,6 @@
 {:main transit-dashboard.main
  :optimizations :advanced
  :closure-defines {goog.DEBUG false}
- :output-dir "target/public/prod"
- :output-to "target/public/prod/transit-dashboard.js"
- :source-map "target/public/prod/transit-dashboard.js.map"}
+ :output-dir "dist"
+ :output-to "dist/main.js"
+ :source-map "dist/main.js.map"}
