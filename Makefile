@@ -6,7 +6,10 @@ dist:
 	mkdir -p $@
 
 dist/index.html: resources/public/index.html | dist
-	bin/prepare-html $< >$@
+	sed -E \
+	  -e 's#<link.+rel="stylesheet" />#<link href="main.css" rel="stylesheet" />#' \
+	  -e 's#<script src="[^"]+"></script>#<script src="main.js"></script>#' \
+	  $< >$@
 
 dist/main.js dist/main.js.map: project.clj prod.cljs.edn $(shell find src -type f \( -name \*.cljs -o -name \*.clj \)) | dist
 	lein trampoline run -m figwheel.main -bo prod

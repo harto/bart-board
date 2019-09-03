@@ -1,3 +1,0 @@
-#!/usr/bin/env sed -E -f
-s#<link.+rel="stylesheet" />#<link href="main.css" rel="stylesheet" />#
-s#<script src="[^"]+"></script>#<script src="main.js"></script>#
