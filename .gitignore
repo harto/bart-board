@@ -3,3 +3,5 @@
 /out
 /target
 .nrepl-port
+/node_modules
+/resources/public/css

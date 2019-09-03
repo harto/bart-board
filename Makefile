@@ -1,28 +1,64 @@
-.PHONY: all clean
+.PHONY: all js css clean distclean
 
-SRC_HTML := resources/public/index.html
-
-JS_SRCS := project.clj prod.cljs.edn $(shell find src -name \*.cljs -o -name \*.clj)
-JS_BUILD := target/public/prod
+JS_SRCS := project.clj prod.cljs.edn $(shell find src -type f \( -name \*.cljs -o -name \*.clj \))
+JS_DIR := target/public/prod
 JS_ENTRYPOINT := transit-dashboard.js
+JS_FILE := $(JS_DIR)/$(JS_ENTRYPOINT)
+JS_SOURCEMAP := $(JS_FILE).map
 
-DIST := dist
-DIST_HTML := $(DIST)/index.html
-DIST_JS_ENTRYPOINT := $(DIST)/$(JS_ENTRYPOINT)
+LESS_DIR := resources/less
+LESS_FILES := $(shell find $(LESS_DIR) -type f -name \*.less)
+CSS_DIR := resources/public/css
+CSS_FILES := $(patsubst $(LESS_DIR)/%.less,$(CSS_DIR)/%.css,$(LESS_FILES))
+LESSC := node_modules/.bin/lessc
 
-all: $(DIST_HTML) $(DIST_JS_ENTRYPOINT)
+DIST_HTML := dist/index.html
+DIST_JS := dist/$(JS_ENTRYPOINT)
+DIST_JS_SOURCEMAP := $(DIST_JS).map
+DIST_CSS_DIR := dist/css
+DIST_CSS := $(patsubst $(CSS_DIR)/%.css,$(DIST_CSS_DIR)/%.css,$(CSS_FILES))
 
-$(DIST):
-	mkdir -p $(DIST)
+all: $(DIST_HTML) $(DIST_JS) $(DIST_JS_SOURCEMAP) $(DIST_CSS)
 
-$(DIST_HTML): $(SRC_HTML) | $(DIST)
+node_modules: package.json yarn.lock
+	yarn install --pure-lockfile
+
+js: $(JS_FILE) $(JS_SOURCEMAP)
+
+$(JS_FILE) $(JS_SOURCEMAP): $(JS_SRC_FILES)
+	lein trampoline run -m figwheel.main -bo prod
+
+css: $(CSS_FILES)
+
+$(CSS_DIR)/%.css: $(LESS_DIR)/%.less | node_modules
+	$(LESSC) $< $@
+
+dist:
+	mkdir -p $@
+
+$(DIST_HTML): resources/public/index.html | dist
 	sed -E "s#<script src=\"[^\"]+\"></script>#<script src=\"$(JS_ENTRYPOINT)\"></script>#" $< >$@
 
-$(DIST_JS_ENTRYPOINT): $(JS_SRCS) | $(DIST)
-	lein trampoline run -m figwheel.main -bo prod
-	cp $(JS_BUILD)/$(JS_ENTRYPOINT) $@
-	cp $(JS_BUILD)/$(JS_ENTRYPOINT).map $@.map
+# TODO: clean up the copypasta
+
+$(DIST_JS): $(JS_FILE) | dist
+	cp $< $@
+
+$(DIST_JS_SOURCEMAP): $(JS_SOURCEMAP) | dist
+	cp $< $@
+
+# TODO: this is probably overkill; we're only gonna have one stylesheet
+$(DIST_CSS_DIR):
+	mkdir -p $@
+
+$(DIST_CSS_DIR)/%.css: $(CSS_DIR)/%.css | $(DIST_CSS_DIR)
+	cp $< $@
 
 clean:
 	lein clean
-	rm -rf $(DIST)
+	rm -rf node_modules
+	rm -rf $(CSS_DIR)
+	rm -rf dist
+
+distclean: clean
+	rm -rf node_modules
