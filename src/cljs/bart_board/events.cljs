@@ -14,7 +14,7 @@
                   [:repeatedly-fetch-departures]]}))
 
 (rf/reg-event-fx :load-prefs
-  [(rf/inject-cofx ::local-storage/get "transit-dashboard.selected-station")]
+  [(rf/inject-cofx ::local-storage/get "bart-board.selected-station")]
   (fn [cofx _]
     (when-let [station-id (::local-storage/val cofx)]
       {:dispatch [:select-station station-id]})))
@@ -43,7 +43,7 @@
 (rf/reg-event-fx :select-station
   (fn [{:keys [db]} [_ station-id]]
     {:db (assoc db :selected-station-id station-id)
-     ::local-storage/merge {"transit-dashboard.selected-station" station-id}}))
+     ::local-storage/merge {"bart-board.selected-station" station-id}}))
 
 ;; Departures
 
