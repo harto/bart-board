@@ -1,4 +1,4 @@
-(ns transit-dashboard.views
+(ns bart-board.views
   (:require [re-frame.core :as rf]))
 
 ;; TODO: depend less directly on the API response format

@@ -1,10 +1,10 @@
-(ns transit-dashboard.events
+(ns bart-board.events
   (:require [re-frame.core :as rf]
             [day8.re-frame.http-fx]  ;; auto-register :http-xhrio effect handler
-            [transit-dashboard.bart :as bart]
-            [transit-dashboard.db :as db]
-            [transit-dashboard.local-storage :as local-storage]
-            [transit-dashboard.utils :refer [key-by]]))
+            [bart-board.api :as api]
+            [bart-board.db :as db]
+            [bart-board.local-storage :as local-storage]
+            [bart-board.utils :refer [key-by]]))
 
 (rf/reg-event-fx :initialize
   (fn [_ _]
@@ -23,8 +23,8 @@
 
 (rf/reg-event-fx :fetch-stations
   (fn [_ _]
-    {:http-xhrio (bart/stations :on-success [:fetch-stations-success]
-                                :on-failure [:fetch-stations-failure])}))
+    {:http-xhrio (api/stations :on-success [:fetch-stations-success]
+                               :on-failure [:fetch-stations-failure])}))
 
 (rf/reg-event-db :fetch-stations-success
   (fn [db [_ resp]]
@@ -54,14 +54,14 @@
 
 (rf/reg-event-fx :fetch-departures
   (fn [_ _]
-    {:http-xhrio (bart/departures :on-success [:fetch-departures-success]
-                                  :on-failure [:fetch-departures-failure])}))
+    {:http-xhrio (api/departures :on-success [:fetch-departures-success]
+                                 :on-failure [:fetch-departures-failure])}))
 
 (rf/reg-event-db :fetch-departures-success
   (fn [db [_ resp]]
     (let [payload (:root resp)
           departures (:station payload)
-          resp-time (bart/parse-time (:date payload) (:time payload))]
+          resp-time (api/parse-time (:date payload) (:time payload))]
       (-> db
           (assoc :departures (key-by departures :abbr))
           (assoc :last-updated-at resp-time)))))

@@ -1,6 +1,6 @@
-{:main transit-dashboard.main
+{:main bart-board.main
  :optimizations :advanced
  :closure-defines {goog.DEBUG false}
- :output-dir "dist"
- :output-to "dist/main.js"
- :source-map "dist/main.js.map"}
+ :output-dir "target/prod"
+ :output-to "target/prod/main.js"
+ :source-map "target/prod/main.js.map"}

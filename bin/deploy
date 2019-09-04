@@ -3,4 +3,16 @@ set -euo pipefail
 
 cd "$(dirname "$0")"/..
 
-aws s3 sync dist/ s3://transit-dashboard/
+BUILD=dist-build
+
+open $BUILD/index.html
+
+read -r -n1 -p "Proceed? (y/n) " response
+echo
+if ! [[ $response =~ [yY] ]]; then
+  exit 1
+fi
+
+aws s3 sync $BUILD/ s3://bart-board/
+
+echo "Deployed: http://bart-board.s3-website-us-east-1.amazonaws.com"

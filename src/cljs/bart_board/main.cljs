@@ -1,14 +1,13 @@
-(ns ^:figwheel-hooks transit-dashboard.main
+(ns ^:figwheel-hooks bart-board.main
   (:require [reagent.core :as reagent]
             [re-frame.core :as re-frame]
-            [transit-dashboard.views :as views]
-            [transit-dashboard.config :as config]
+            [bart-board.views :as views]
             ;; register events and subs
-            [transit-dashboard.events]
-            [transit-dashboard.subs]))
+            [bart-board.events]
+            [bart-board.subs]))
 
 (defn dev-setup []
-  (when config/debug?
+  (when ^boolean goog.DEBUG
     (enable-console-print!)
     (println "dev mode")))
 

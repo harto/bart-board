@@ -1,4 +1,4 @@
-(ns transit-dashboard.bart
+(ns bart-board.api
   (:require [ajax.core :as ajax]
             [ajax.protocols]
             [clojure.data.xml :as xml]
@@ -80,3 +80,19 @@
       (.setSeconds (js/parseInt second 10))
       ;; nowhere to put timezone :(
       )))
+
+;;
+
+(comment
+
+  (require-macros '[cljs.core.async.macros :refer [go]])
+  (require '[cljs.core.async :refer [<! chan put!]])
+  (require '[ajax.core :as ajax])
+
+  (defn fetch [req]
+    (let [c (chan)]
+      (ajax/ajax-request (merge req {:handler (fn [e]
+                                                (put! c e))}))
+      c))
+
+  (go (println (<! (fetch (departures))))))

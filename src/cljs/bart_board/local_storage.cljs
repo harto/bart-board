@@ -1,5 +1,5 @@
-(ns transit-dashboard.local-storage
-  (:refer-clojure :exclude [assoc! get select-keys])
+(ns bart-board.local-storage
+  (:refer-clojure :exclude [assoc! get select-keys update])
   (:require [re-frame.core :as rf]))
 
 (def storage js/window.localStorage)

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "$0")"/..
+
+make css
+if command -v fswatch &>/dev/null; then
+  set -m
+  (fswatch -o src/less | xargs -n1 -I_ make css &>less.log) &
+  echo "watching src/less (pid=$!); output sent to less.log"
+  trap 'kill %%' EXIT
+else
+  echo "warning: fswatch not installed; less will not be automatically recompiled"
+fi
+
+lein fig:dev

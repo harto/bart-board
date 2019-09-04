@@ -1,4 +1,4 @@
-(ns transit-dashboard.db)
+(ns bart-board.db)
 
 (def default-db
   {:departures nil

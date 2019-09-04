@@ -1,2 +1,2 @@
 ^{:css-dirs ["resources/public/css"]}
-{:main transit-dashboard.main}
+{:main bart-board.main}

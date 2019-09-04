@@ -1,7 +1,7 @@
 /*.log
-/dist
 /out
 /target
 .nrepl-port
 /node_modules
 /resources/public/css/*.css
+/dist-build
